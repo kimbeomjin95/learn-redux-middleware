@@ -4,14 +4,19 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+// 프로젝트에 redux 적용
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import rootReducer from './modules';
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+// 스토어 생성(스토어는 하나의 리듀서만 받을 수 있음)
+const store = createStore(rootReducer);
+
+ReactDOM.render(
+  // 프로젝트의 redux 적용 완료
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.getElementById('root'),
+);
 reportWebVitals();
