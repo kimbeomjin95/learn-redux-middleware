@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Counter from '../components/Counter';
-import { decrease, increase } from '../modules/counter';
+import { decreaseAsync, increaseAsync } from '../modules/counter';
 
 // store로 부터 props 를 받아옴
 function CounterContainer() {
@@ -9,8 +9,8 @@ function CounterContainer() {
   const number = useSelector(state => state.counter); // reducer의 이름이 counter이므로(counter값이 숫자이므로, 초기값이 숫자이므로)
   const dispatch = useDispatch();
 
-  const onIncrease = () => dispatch(increase()); // 액션 만들고 dispatch
-  const onDecrease = () => dispatch(decrease());
+  const onIncrease = () => dispatch(increaseAsync()); // 액션 만들고 dispatch
+  const onDecrease = () => dispatch(decreaseAsync());
 
   return (
     <Counter number={number} onIncrease={onIncrease} onDecrease={onDecrease} />
