@@ -52,3 +52,33 @@ export const createPromiseThunk = (type, promiseCreator) => {
 
   return thunkCreator;
 };
+
+// createPromiseThunk(type)과 동일
+// key: 각 action들마다 관리하는 key가 다름, payload.posts, payload.post
+// handleAsyncActoins: 3가지 액션들에 대한 reducer를 만들어서 반환
+export const handleAsyncActoins = (type, key) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
+
+  // reducer
+  return (state, action) => {
+    switch (action.type) {
+      case type:
+        return {
+          ...state,
+          [key]: reducerUtils.loading, // [key]: [post, posts]
+        };
+      case SUCCESS:
+        return {
+          ...state,
+          [key]: reducerUtils.success(action.payload), // payload: [posts, post]
+        };
+      case ERROR:
+        return {
+          ...state,
+          [key]: reducerUtils.error(action.payload),
+        };
+      default:
+        return state;
+    }
+  };
+};
