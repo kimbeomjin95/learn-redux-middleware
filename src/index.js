@@ -8,10 +8,14 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux'; // applyMiddleware: 미들웨어 적용
 import rootReducer from './modules';
-import myLogger from './middlewares/myLogger';
+import logger from 'redux-logger'; // myLogger를 redux-logger로 대체
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 // 스토어 생성(스토어는 하나의 리듀서만 받을 수 있음)
-const store = createStore(rootReducer, applyMiddleware(myLogger));
+const store = createStore(
+  rootReducer,
+  composeWithDevTools(applyMiddleware(logger)), // redux 개발자도구 적용
+);
 
 ReactDOM.render(
   // 프로젝트의 redux 적용 완료
