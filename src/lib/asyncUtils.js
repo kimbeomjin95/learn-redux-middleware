@@ -22,3 +22,33 @@ export const reducerUtils = {
     error,
   }),
 };
+
+// type: 요청이 시작했음을 알리는 type(GET_POSTS, GET_POST)
+// promiseCreate: 특정 파라미터를 가져와서 프로미스를 만들어주는 함수(postsAPI.getPosts())
+export const createPromiseThunk = (type, promiseCreator) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
+
+  // thunk 함수 반환
+  const thunkCreator = param => async dispatch => {
+    // 로딩시
+    dispatch({ type });
+    try {
+      // payload: posts, post의 이름을 payload로 통합
+      const payload = await promiseCreator(param);
+      // 성공시
+      dispatch({
+        type: SUCCESS,
+        payload,
+      });
+    } catch (e) {
+      // 실패시
+      dispatch({
+        type: ERROR,
+        payload: e,
+        error: true, // FSA 규칙
+      });
+    }
+  };
+
+  return thunkCreator;
+};

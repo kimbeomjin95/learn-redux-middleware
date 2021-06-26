@@ -1,0 +1,8 @@
+// {
+//   "editor.semanticTokenColorCustomizations": {
+//     "enabled": true,
+//     "rules": {
+//       "variable.defaultLibrary": "#4EC9B0"
+//     }
+//   }
+// }
