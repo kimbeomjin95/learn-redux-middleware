@@ -11,6 +11,7 @@ import rootReducer from './modules';
 import logger from 'redux-logger'; // myLogger를 redux-logger로 대체
 import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
+import { BrowserRouter } from 'react-router-dom';
 
 // 스토어 생성(스토어는 하나의 리듀서만 받을 수 있음)
 const store = createStore(
@@ -20,9 +21,11 @@ const store = createStore(
 
 ReactDOM.render(
   // 프로젝트의 redux 적용 완료
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <BrowserRouter>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </BrowserRouter>,
   document.getElementById('root'),
 );
 reportWebVitals();

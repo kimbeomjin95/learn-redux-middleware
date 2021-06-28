@@ -1,8 +1,16 @@
 import './App.css';
-import PostListContainer from './containers/PostListContainer';
+import { Route } from 'react-router-dom';
+import PostListPage from './pages/PostListPage';
+import PostPage from './pages/PostPage';
 
 function App() {
-  return <PostListContainer />;
+  return (
+    <>
+      <Route path="/" component={PostListPage} exact />
+      {/* exact는 이하 경로를 중복 출력하지 않도록한다 */}
+      <Route path="/:id" component={PostPage} />
+    </>
+  );
 }
 
 export default App;
