@@ -65,7 +65,7 @@ export const handleAsyncActoins = (type, key) => {
       case type:
         return {
           ...state,
-          [key]: reducerUtils.loading, // [key]: [post, posts]
+          [key]: reducerUtils.loading(), // [key]: [post, posts]
         };
       case SUCCESS:
         return {
