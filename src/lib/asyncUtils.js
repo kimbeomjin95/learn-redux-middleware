@@ -56,7 +56,7 @@ export const createPromiseThunk = (type, promiseCreator) => {
 // createPromiseThunk(type)과 동일
 // key: 각 action들마다 관리하는 key가 다름, payload.posts, payload.post
 // handleAsyncActoins: 3가지 액션들에 대한 reducer를 만들어서 반환
-export const handleAsyncActoins = (type, key) => {
+export const handleAsyncActoins = (type, key, keepData) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
 
   // reducer
@@ -65,7 +65,8 @@ export const handleAsyncActoins = (type, key) => {
       case type:
         return {
           ...state,
-          [key]: reducerUtils.loading(), // [key]: [post, posts]
+          // [key]: [post, posts]
+          [key]: reducerUtils.loading(keepData ? state[key].data : null), // true시 기존 상태를 유지하겠단 의미
         };
       case SUCCESS:
         return {
