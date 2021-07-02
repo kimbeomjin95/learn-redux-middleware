@@ -30,7 +30,6 @@ function PostContainer({ postId }) {
     <>
       <button onClick={() => dispatch(goToHome())}>홈으로</button>
       <Post post={data} />
-
     </>
   );
 }

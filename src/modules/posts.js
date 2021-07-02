@@ -1,4 +1,4 @@
-import * as postsAPI from '../api/post';
+import * as postsAPI from '../api/posts';
 import {
   createPromiseThunk,
   createPromiseThunkById,
@@ -25,8 +25,10 @@ export const getPosts = createPromiseThunk(GET_POSTS, postsAPI.getPosts);
 
 // post 데이터 상태구조 변경을 위한 thunk함수 생성(getPost를 위한 thunk함수 생성완료)
 export const getPost = createPromiseThunkById(GET_POST, postsAPI.getPostById);
-export const goToHome = () =>
-  (dispatch, getState, { history }) => { // extra.history를 비구조화 할당
+export const goToHome =
+  () =>
+  (dispatch, getState, { history }) => {
+    // extra.history를 비구조화 할당
     history.push('/'); // 홈으로 이동
   };
 
