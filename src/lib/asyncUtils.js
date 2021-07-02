@@ -29,7 +29,7 @@ export const createPromiseThunk = (type, promiseCreator) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
 
   // thunk 함수 반환
-  const thunkCreator = param => async dispatch => {
+  return param => async dispatch => {
     // 로딩시
     dispatch({ type });
     try {
@@ -49,8 +49,44 @@ export const createPromiseThunk = (type, promiseCreator) => {
       });
     }
   };
+};
 
-  return thunkCreator;
+// 파라미터 자체가 ID의 의미
+const defaultIdSelector = param => param;
+
+// idSelector: API를 호출할 때 사용하는 파라미터에서 ID를 어떻게 선택할지 정의해주는 함수
+export const createPromiseThunkById = (
+  type,
+  promiseCreator,
+  idSelector = defaultIdSelector,
+) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
+
+  // thunk 함수 반환
+  return param => async dispatch => {
+    const id = idSelector(param);
+
+    // 로딩시
+    dispatch({ type, meta: id });
+    try {
+      // payload: posts, post의 이름을 payload로 통합
+      const payload = await promiseCreator(param);
+      // 성공시
+      dispatch({
+        type: SUCCESS,
+        payload,
+        meta: id,
+      });
+    } catch (e) {
+      // 실패시
+      dispatch({
+        type: ERROR,
+        payload: e,
+        error: true, // FSA 규칙
+        meta: id,
+      });
+    }
+  };
 };
 
 // createPromiseThunk(type)과 동일
@@ -77,6 +113,50 @@ export const handleAsyncActoins = (type, key, keepData) => {
         return {
           ...state,
           [key]: reducerUtils.error(action.payload),
+        };
+      default:
+        return state;
+    }
+  };
+};
+
+// action meta값의 id를 참조해서 상태를 업데이트
+// handleAsyncActoinsById: action.meta값을 참고해서 [key]값을 바로 업데이트 하는 것이 아니라
+// [key]안에 있는 id객체를 업데이트 하는 것
+export const handleAsyncActoinsById = (type, key, keepData) => {
+  const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
+
+  // reducer
+  return (state, action) => {
+    const id = action.meta;
+    switch (action.type) {
+      case type:
+        return {
+          ...state,
+          // [key]: [post, posts]
+          [key]: {
+            ...state[key],
+            // state[key][id]가 undefined인 경우 에러방지
+            [id]: reducerUtils.loading(
+              keepData ? state[key][id] && state[key][id].data : null,
+            ), // keepData: true시 로딩중에도 데이터를 초기화하지 않겠다란 의미(기존 데이터 재사용)
+          },
+        };
+      case SUCCESS:
+        return {
+          ...state,
+          [key]: {
+            ...state[key],
+            [id]: reducerUtils.success(action.payload), // payload: [posts, post]
+          },
+        };
+      case ERROR:
+        return {
+          ...state,
+          [key]: {
+            ...state[key],
+            [id]: reducerUtils.error(action.payload), // payload: [posts, post]
+          },
         };
       default:
         return state;

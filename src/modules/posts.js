@@ -1,7 +1,9 @@
 import * as postsAPI from '../api/post';
 import {
   createPromiseThunk,
+  createPromiseThunkById,
   handleAsyncActoins,
+  handleAsyncActoinsById,
   reducerUtils,
 } from '../lib/asyncUtils';
 
@@ -22,20 +24,7 @@ const CELAR_POST = 'CELAR_POST';
 export const getPosts = createPromiseThunk(GET_POSTS, postsAPI.getPosts);
 
 // post 데이터 상태구조 변경을 위한 thunk함수 생성(getPost를 위한 thunk함수 생성완료)
-export const getPost = id => async dispatch => {
-  dispatch({ type: GET_POST, meta: id }); //요 meta값에 id를 전달해주면 reducer에서 id를 참고해서 상태를 udpate 함
-  try {
-    const payload = await postsAPI.getPostById(id); // payload: posts, post의 이름을 payload로 통합
-    dispatch({ type: GET_POST_SUCCESS, payload, meta: id }); // API 청이 성공했다는걸 의미하는 dispatch
-  } catch (e) {
-    dispatch({
-      type: GET_POST_ERROR,
-      payload: e,
-      error: true,
-      meta: id,
-    });
-  }
-};
+export const getPost = createPromiseThunkById(GET_POST, postsAPI.getPostById);
 export const clearPost = () => ({ type: CELAR_POST });
 
 // 초기값
@@ -44,46 +33,11 @@ const initialState = {
   post: {},
 };
 
-// handleAsyncActoins
+// handleAsyncActoins(유틸함수)
+// 유틸함수를 만들어야 하는 이유는 리액트와 리덕스를 사용하여 api연동을 하는 경우에 
+// 비슷한 코드를 자주 작성하게 될 것이기 때문임
 const getPostsReducer = handleAsyncActoins(GET_POSTS, 'posts', true);
-
-// 직접 reducer 작성
-const getPostReducer = (state, action) => {
-  const id = action.meta;
-  switch (action.type) {
-    case GET_POST:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          // 특정 아이디(key)를 사용해서 로딩중 상태 만들기
-          // 기존의 불러온 상태가 있다면 그 상태를 재사용하기 위함(로딩중에 데이터 유지)
-          // 최초 특정 포스트를 불러올때 state.post[id]값이 undefined이므로 data를 조회하면 에러가 발생하므로 이를 방지하기 위해 조건 추가
-          [id]: reducerUtils.loading(state.post[id] && state.post[id].data),
-        },
-      };
-    case GET_POST_SUCCESS:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          // 특정 아이디(key)를 사용해서 로딩중 상태 만들기
-          // 기존의 불러온 상태가 있다면 그 상태를 재사용하기 위함(로딩중에 데이터 유지)
-          // 최초 특정 포스트를 불러올때 state.post[id]값이 undefined이므로 data를 조회하면 에러가 발생하므로 이를 방지하기 위해 조건 추가
-          [id]: reducerUtils.loading(action.payload),
-        },
-      };
-    case GET_POST_ERROR:
-      return {
-        ...state,
-        post: {
-          ...state.post,
-          [id]: reducerUtils.error(action.payload),
-        },
-      };
-    default:
-  }
-};
+const getPostReducer = handleAsyncActoinsById(GET_POST, 'post', true);
 
 // handleAsyncActoins reducer
 export default function posts(state = initialState, action) {
