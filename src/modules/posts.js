@@ -1,3 +1,4 @@
+import { call, put, takeEvery } from 'redux-saga/effects';
 import * as postsAPI from '../api/posts';
 import {
   createPromiseThunk,
@@ -19,12 +20,60 @@ const GET_POST_ERROR = 'GET_POST_ERROR';
 // 포스트 비우기
 const CELAR_POST = 'CELAR_POST';
 
-// 액션 생성 함수를 만들지 않고 thunk에서 직접 dispatch 할 수 있음
-// createPromiseThunk 생성 함수
-export const getPosts = createPromiseThunk(GET_POSTS, postsAPI.getPosts);
+// saga를 위한 액션 순수함수 생성
+export const getPosts = () => ({
+  type: GET_POSTS,
+});
+export const getPost = id => ({
+  type: GET_POST,
+  payload: id, // payload: 사가에서 api를 호출할 때 id값을 param으로 사용하기 위함
+  meta: id, // meta: 리듀서에서 처리할 때 사용하는 용도
+});
 
-// post 데이터 상태구조 변경을 위한 thunk함수 생성(getPost를 위한 thunk함수 생성완료)
-export const getPost = createPromiseThunkById(GET_POST, postsAPI.getPostById);
+function* getPostsSaga() {
+  try {
+    const posts = yield call(postsAPI.getPosts); // call: 특정 함수 호출, postsAPI.getPosts가 호출되면 promise가 반환됨
+    yield put({
+      // put: 특정 액션을 디스패치 할 것
+      type: GET_POSTS_SUCCESS,
+      payload: posts,
+    });
+  } catch (e) {
+    yield put({
+      // put: 특정 액션을 디스패치 할 것
+      type: GET_POSTS_ERROR,
+      payload: e,
+      error: true,
+    });
+  }
+}
+
+function* getPostSaga(action) {
+  // action: saga 함수에서 action정보를 보는 법
+  const id = action.payload;
+  try {
+    const post = yield call(postsAPI.getPostById, id);
+    yield put({
+      type: GET_POST_SUCCESS,
+      payload: post,
+      meta: id,
+    });
+  } catch (e) {
+    yield put({
+      type: GET_POST_ERROR,
+      payload: e,
+      error: true,
+      meta: id,
+    });
+  }
+}
+
+// 사가를 모니터링하는 함수
+export function* postsSaga() {
+  yield takeEvery(GET_POSTS, getPostsSaga);
+  yield takeEvery(GET_POST, getPostSaga);
+}
+
 export const goToHome =
   () =>
   (dispatch, getState, { history }) => {
