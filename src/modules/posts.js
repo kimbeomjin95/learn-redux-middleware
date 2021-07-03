@@ -1,4 +1,4 @@
-import { takeEvery } from 'redux-saga/effects';
+import { getContext, select, takeEvery } from 'redux-saga/effects';
 import * as postsAPI from '../api/posts';
 import {
   createPromiseSaga,
@@ -17,8 +17,11 @@ const GET_POST = 'GET_POST';
 const GET_POST_SUCCESS = 'GET_POST_SUCCESS';
 const GET_POST_ERROR = 'GET_POST_ERROR';
 
+const GO_TO_HOME = 'GO_TO_HOME';
+
 // 포스트 비우기
 const CELAR_POST = 'CELAR_POST';
+const PRINT_STATE = 'PRINT_STATE';
 
 // saga를 위한 액션 순수함수 생성
 export const getPosts = () => ({
@@ -30,6 +33,9 @@ export const getPost = id => ({
   meta: id, // meta: 리듀서에서 처리할 때 사용하는 용도
 });
 
+export const printState = () => ({
+  type: PRINT_STATE,
+});
 // function* getPostsSaga() {
 //   try {
 //     const posts = yield call(postsAPI.getPosts); // call: 특정 함수 호출, postsAPI.getPosts가 호출되면 promise가 반환됨
@@ -72,18 +78,28 @@ export const getPost = id => ({
 const getPostsSaga = createPromiseSaga(GET_POSTS, postsAPI.getPosts);
 const getPostSaga = createPromiseSagaById(GET_POST, postsAPI.getPostById);
 
+export const goToHome = () => ({
+  type: GO_TO_HOME,
+});
+// GO_TO_HOME saga
+function* goToHomeSaga() {
+  const history = yield getContext('history');
+  history.push('/');
+}
+
+// 사가에서 현재 리덕스 스토어가 가지고 있는 상태를 조회(select effects)
+// 사가를 작성하게 될 때 로직에서 현재 상태에 따라 조건부로 작업을 해야 할 경우에는 select effects를 사용
+function* printStateSaga() {
+  const state = yield select(state => state.posts);
+  console.log(state);
+}
 // 사가를 모니터링하는 함수
 export function* postsSaga() {
   yield takeEvery(GET_POSTS, getPostsSaga);
   yield takeEvery(GET_POST, getPostSaga);
+  yield takeEvery(GO_TO_HOME, goToHomeSaga);
+  yield takeEvery(PRINT_STATE, printStateSaga);
 }
-
-export const goToHome =
-  () =>
-  (dispatch, getState, { history }) => {
-    // extra.history를 비구조화 할당
-    history.push('/'); // 홈으로 이동
-  };
 
 export const clearPost = () => ({ type: CELAR_POST });
 

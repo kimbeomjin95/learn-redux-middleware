@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Post from '../components/Post';
 import { reducerUtils } from '../lib/asyncUtils';
-import { clearPost, getPost, goToHome } from '../modules/posts';
+import { clearPost, getPost, goToHome, printState } from '../modules/posts';
 
 function PostContainer({ postId }) {
   // postId: 라우터 파라미터를 통해 받아 올 것
@@ -29,6 +29,7 @@ function PostContainer({ postId }) {
   return (
     <>
       <button onClick={() => dispatch(goToHome())}>홈으로</button>
+      <button onClick={() => dispatch(printState())}>상태출력</button>
       <Post post={data} />
     </>
   );

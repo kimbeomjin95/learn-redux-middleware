@@ -16,7 +16,12 @@ import { createBrowserHistory } from 'history'; // react-router 설치할 때 �
 import createSagaMiddleware from 'redux-saga';
 
 const customHistory = createBrowserHistory();
-const sagaMiddleware = createSagaMiddleware();
+// context에 등록을 하면 saga에서 조회를 할 수 있음
+const sagaMiddleware = createSagaMiddleware({
+  context: {
+    history: customHistory,
+  },
+});
 
 // 스토어 생성(스토어는 하나의 리듀서만 받을 수 있음)
 const store = createStore(

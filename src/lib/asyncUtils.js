@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 
 // 초기상태를 선언하는 부분과 각 액션타입에 대하여 업데이트 하는 로직을 좀더 편리할 수 사용할 수 있게끔 생성
 export const reducerUtils = {
@@ -31,7 +31,6 @@ export const createPromiseSaga = (type, promiseCreator) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`]; // 배열 비구조화 할당
   return function* saga(action) {
     // action: api를 요청할 때 파라미터를 필요로 할 수 있기 때문
-    console.log('createPromiseSaga, ' + action.payload);
     try {
       const result = yield call(promiseCreator, action.payload);
       // 성공
@@ -56,7 +55,6 @@ export const createPromiseSagaById = (type, promiseCreator) => {
   return function* saga(action) {
     // action: api를 요청할 때 파라미터를 필요로 할 수 있기 때문
     const id = action.meta;
-    console.log('createPromiseSagaById, ' + id);
     try {
       const result = yield call(promiseCreator, action.payload);
       // 성공
