@@ -1,8 +1,8 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga/effects';
 import * as postsAPI from '../api/posts';
 import {
-  createPromiseThunk,
-  createPromiseThunkById,
+  createPromiseSaga,
+  createPromiseSagaById,
   handleAsyncActoins,
   handleAsyncActoinsById,
   reducerUtils,
@@ -30,43 +30,47 @@ export const getPost = id => ({
   meta: id, // meta: 리듀서에서 처리할 때 사용하는 용도
 });
 
-function* getPostsSaga() {
-  try {
-    const posts = yield call(postsAPI.getPosts); // call: 특정 함수 호출, postsAPI.getPosts가 호출되면 promise가 반환됨
-    yield put({
-      // put: 특정 액션을 디스패치 할 것
-      type: GET_POSTS_SUCCESS,
-      payload: posts,
-    });
-  } catch (e) {
-    yield put({
-      // put: 특정 액션을 디스패치 할 것
-      type: GET_POSTS_ERROR,
-      payload: e,
-      error: true,
-    });
-  }
-}
+// function* getPostsSaga() {
+//   try {
+//     const posts = yield call(postsAPI.getPosts); // call: 특정 함수 호출, postsAPI.getPosts가 호출되면 promise가 반환됨
+//     yield put({
+//       // put: 특정 액션을 디스패치 할 것
+//       type: GET_POSTS_SUCCESS,
+//       payload: posts,
+//     });
+//   } catch (e) {
+//     yield put({
+//       // put: 특정 액션을 디스패치 할 것
+//       type: GET_POSTS_ERROR,
+//       payload: e,
+//       error: true,
+//     });
+//   }
+// }
 
-function* getPostSaga(action) {
-  // action: saga 함수에서 action정보를 보는 법
-  const id = action.payload;
-  try {
-    const post = yield call(postsAPI.getPostById, id);
-    yield put({
-      type: GET_POST_SUCCESS,
-      payload: post,
-      meta: id,
-    });
-  } catch (e) {
-    yield put({
-      type: GET_POST_ERROR,
-      payload: e,
-      error: true,
-      meta: id,
-    });
-  }
-}
+// function* getPostSaga(action) {
+//   // action: saga 함수에서 action정보를 보는 법
+//   const id = action.payload;
+//   try {
+//     const post = yield call(postsAPI.getPostById, id);
+//     yield put({
+//       type: GET_POST_SUCCESS,
+//       payload: post,
+//       meta: id,
+//     });
+//   } catch (e) {
+//     yield put({
+//       type: GET_POST_ERROR,
+//       payload: e,
+//       error: true,
+//       meta: id,
+//     });
+//   }
+// }
+
+// saga 유틸함수
+const getPostsSaga = createPromiseSaga(GET_POSTS, postsAPI.getPosts);
+const getPostSaga = createPromiseSagaById(GET_POST, postsAPI.getPostById);
 
 // 사가를 모니터링하는 함수
 export function* postsSaga() {
